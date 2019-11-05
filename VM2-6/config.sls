@@ -1,6 +1,5 @@
-# Configuration eth1 et eth2
-# avec service radvd
-# RAPPEL: eth0 est à vagrant, ne pas y toucher
+# Configuration eth1
+# RAPPEL: eth0 est reservé à vagrant
 
 ## Désactivation de network-manager
 NetworkManager:
@@ -8,7 +7,12 @@ NetworkManager:
     - dead
     - enable: False
     
-## Configuration de VM2
+## Suppression de la passerelle par défaut
+ip route del default:
+  cmd:
+    - run
+
+## Configuration de VM2-6
 eth1:
   network.managed:
     - enabled: True
@@ -18,7 +22,7 @@ eth1:
     - ipv6proto: static
     - enable_ipv6: true
     - ipv6_autoconf: no
-    - ipv6ipaddr: fc00:1234:1::2
+    - ipv6ipaddr: fc00:1234:1::26
     - ipv6netmask: 64
 
 eth2:
@@ -30,7 +34,7 @@ eth2:
     - ipv6proto: static
     - enable_ipv6: true
     - ipv6_autoconf: no
-    - ipv6ipaddr: fc00:1234:2::2
+    - ipv6ipaddr: fc00:1234:2::26
     - ipv6netmask: 64
 
 ## No need to add routes
@@ -40,23 +44,3 @@ net.ipv6.conf.all.forwarding:
   sysctl:
     - present
     - value: 1
-
-## Install and configure radvd
-radvd:
-  pkg:
-    - installed
-  service:
-    - running
-    - enable: True
-
-/etc/radvd.conf:
-    file.managed:
-      - source: /vagrant/radvd.conf
-      - user: root
-      - group: root
-      - mode: 644
-
-# restart radvd:
-service radvd restart:
-  cmd:
-    - run

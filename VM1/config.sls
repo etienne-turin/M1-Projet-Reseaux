@@ -1,4 +1,4 @@
-# Configuration eth1 et eth2
+# Configuration eth1
 # RAPPEL: eth0 est à vagrant, ne pas y toucher
 
 ## Désactivation de network-manager
@@ -6,43 +6,46 @@ NetworkManager:
   service:
     - dead
     - enable: False
+    
+## Suppression de la passerelle par défaut
+ip route del default:
+  cmd:
+    - run
 
+##Configuration de VM1
+eth1:
+  network.managed:
+    - enabled: True
+    - type: eth
+    - proto: none
+    - ipaddr: 172.16.2.131
+    - netmask: 28
 
-## Configuration de VM1
+eth2:
+  network.managed:
+    - enabled: True
+    - type: eth
+    - proto: none
+    - ipaddr: 172.16.2.151
+    - netmask: 28
 
-# en statique
- eth1:
-   network.managed:
-     - enabled: True
-     - type: eth
-     - proto: static
-     - enable_ipv4: true
-     - enable_ipv6: false
-     - ipaddr: 172.16.2.131
-     - netmask: 28
-
-# en statique
- eth2:
-   network.managed:
-     - enabled: True
-     - type: eth
-     - proto: static
-     - enable_ipv4: true
-     - enable_ipv6: false
-     - ipaddr: 172.16.2.151
-     - netmask: 28
-
-# Config Routes
+## Configuration de la route vers LAN2 et LAN4 via VM2
 routes:
   network.routes:
-    - name: eth0
+    - name: eth1
     - routes:
-      - name: LAN2
-        ipaddr: 172.16.2.160
-        netmask: 255.255.255.240
-        gateway: 172.16.2.132
       - name: LAN4
-        ipaddr: 172.16.2.176
-        netmask: 28
+        ipaddr: 172.16.2.176/28
         gateway: 172.16.2.132
+      - name: LAN2
+        ipaddr: 172.16.2.160/28
+        gateway: 172.16.2.132
+
+## Enable ipv4 forwarding
+net.ipv4.ip_forward:
+  sysctl:
+    - present
+    - value: 1
+
+
 
